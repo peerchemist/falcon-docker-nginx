@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+
+  falcon:
+    tty: true
+    container_name: falcon
+    build: .
+    ports:
+      - "8000:8000"
+    volumes: # mount local files like so
+      - ./sqlite.db:/app/sqlite.db
+    environment:
+      - LOGLEVEL='debug'
+
+  swag:
+    image: linuxserver/swag
+    container_name: swag
+    depends_on:
+      - falcon
+    volumes:
+      - ./default.conf:/config/nginx/site-confs/default
+    environment:
+      - EMAIL=user@domain
+      - URL=mysite.com
+      - SUBDOMAINS=www
+      - VALIDATION=http
+      - TZ=Europe/Zagreb
+      - PUID=500
+      - PGID=500
+    ports:
+      - "443:443"
+      - "80:80"
